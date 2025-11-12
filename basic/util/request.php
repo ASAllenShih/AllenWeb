@@ -271,12 +271,12 @@ class Request
 		$headers = [];
 		curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$headers) {
 			$len = strlen($header);
-			$pos = strpos($header, ':');
-			if ($pos === false) {
+			$header_array = explode(':', $header, 2);
+			if (count($header_array) < 2) {
 				return $len;
 			}
-			$name = strtolower(substr($header, 0, $pos));
-			$value = trim(substr($header, $pos + 1));
+			$name = strtolower(trim($header_array[0]));
+			$value = trim($header_array[1]);
 			if (!array_key_exists($name, $headers)) {
 				$headers[$name] = [];
 			}
@@ -287,25 +287,6 @@ class Request
 			ch: $ch,
 			headers: $headers,
 		);
-		$response = curl_exec($ch);
-		$error = curl_error($ch);
-		if (!empty($error) && $response === false) {
-			$code = 0;
-			$response = [
-				'error' => $error,
-			];
-		} else {
-			$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			if (json_validate($response)) {
-				$response = json_decode($response, true);
-			}
-		}
-		curl_close($ch);
-		return [
-			'code' => $code,
-			'response' => $response,
-			'header' => $headers,
-		];
 	}
 	protected static function _CurlReturn(CurlHandle $ch, array &$headers, null|string|bool $response = null)
 	{
