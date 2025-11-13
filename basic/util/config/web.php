@@ -7,6 +7,7 @@ Config::SetType('web.start.site_name', ConfigType::String);
 Config::SetType('web.start.site_description', ConfigType::String);
 Config::SetType('web.start.site_home', ConfigType::String);
 Config::SetType('web.start.web_logo', ConfigType::String);
+Config::SetType('web.start.web_logo_px', ConfigType::Int);
 Config::SetType('web.start.theme_color', ConfigType::String);
 Config::SetType('web.start.link.preconnect', ConfigType::Array);
 Config::SetType('web.start.link.web_style', ConfigType::String);
