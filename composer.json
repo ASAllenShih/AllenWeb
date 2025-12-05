@@ -1,7 +1,7 @@
 {
     "require": {
         "spatie/async": "^1.6",
-		"phpmailer/phpmailer": "^6.9",
+		"phpmailer/phpmailer": "^7.0",
 		"google/apiclient": "^2.18",
         "renoki-co/l1": "^0.1.0",
         "spomky-labs/otphp": "^11.3",
