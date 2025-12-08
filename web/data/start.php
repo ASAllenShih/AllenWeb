@@ -1,8 +1,6 @@
 <?php
-require_once __DIR__ . '/../../main.php';
 
-use Allen\Basic\Util\Config;
-use Allen\Basic\Util\Language;
+use Allen\Basic\Util\{Config, Language};
 
 Config::Init();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_DynPage']) && Config::Get('web.dynamic_page', false)) {
@@ -20,7 +18,7 @@ require_once __DIR__ . '/start/head.php';
 ?>
 <body>
 	<?php
-	require_once __DIR__ . '/start/header.php';
+	if ($header ?? true) require_once __DIR__ . '/start/header.php';
 	?>
 	<main>
 		<?php
