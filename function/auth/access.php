@@ -10,7 +10,7 @@ use InvalidArgumentException;
 
 class Access
 {
-	static protected function TeamName(): string
+	static public function TeamName(): string
 	{
 		$data = Config::Get('function.auth.access.team');
 		if (!is_string($data)) {
