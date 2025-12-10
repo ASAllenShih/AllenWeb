@@ -29,11 +29,21 @@ class Filter
 			),
 		);
 	}
+	public static function InArray(array $data, ?array $array = null, ?callable $item_callback = null): array
+	{
+		return self::Callback(
+			data: $data,
+			callback: fn($item) => self::ResultInArray(
+				item: self::DataItem(
+					item: $item,
+					item_callback: $item_callback,
+				),
+				array: $array,
+			),
+		);
+	}
 	public static function RegexQuery(array $data, ?string $query = null, ?callable $item_callback = null): array
 	{
-		$query_data = self::DataQuery(
-			query: $query,
-		);
 		return self::Callback(
 			data: $data,
 			callback: fn($item) => self::ResultRegexQuery(
@@ -41,7 +51,49 @@ class Filter
 					item: $item,
 					item_callback: $item_callback,
 				),
-				query_data: $query_data,
+				query_data: self::DataQuery(
+					query: $query,
+				),
+			),
+		);
+	}
+	public static function InArrayQuery(array $data, ?string $query = null, ?callable $item_callback = null): array
+	{
+		return self::Callback(
+			data: $data,
+			callback: fn($item) => self::ResultInArrayQuery(
+				item: self::DataItem(
+					item: $item,
+					item_callback: $item_callback,
+				),
+				query_data: self::DataQuery(
+					query: $query,
+				),
+			),
+		);
+	}
+	public static function Query(array $data, ?string $query = null, ?callable $item_callback = null, bool $regex = true, bool $in_array = true): array
+	{
+		$query_data = self::DataQuery(
+			query: $query,
+		);
+		return self::Callback(
+			data: $data,
+			callback: fn($item) => !(
+				!$regex ?: !self::ResultRegexQuery(
+					item: self::DataItem(
+						item: $item,
+						item_callback: $item_callback,
+					),
+					query_data: $query_data,
+				)
+				|| !$in_array ?: !self::ResultInArrayQuery(
+					item: self::DataItem(
+						item: $item,
+						item_callback: $item_callback,
+					),
+					query_data: $query_data,
+				)
 			),
 		);
 	}
@@ -197,6 +249,15 @@ class Filter
 			) === 1
 			: true;
 	}
+	protected static function ResultInArray(mixed $item, ?array $array = null): bool
+	{
+		return is_array($array)
+			? in_array(
+				$item,
+				$array,
+			)
+			: true;
+	}
 	protected static function ResultRegexQuery(mixed $item, null|string|array $query_data = null): bool
 	{
 		return is_string($query_data)
@@ -214,6 +275,21 @@ class Filter
 						),
 						$query_data,
 					),
+				)
+				: true
+			);
+	}
+	protected static function ResultInArrayQuery(mixed $item, null|string|array $query_data = null): bool
+	{
+		return is_string($query_data)
+			? self::ResultInArray(
+				item: $item,
+				array: array_map('trim', explode(',', $query_data)),
+			)
+			: (is_array($query_data)
+				? self::ResultInArray(
+					item: $item,
+					array: $query_data,
 				)
 				: true
 			);
