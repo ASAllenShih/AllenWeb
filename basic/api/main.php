@@ -101,25 +101,40 @@ class API
 		}
 		return $data;
 	}
-	public static function Output(mixed $data, bool $pretty = false, bool $etag = true, ?int $last_modified = null): never
+	public static function Output(mixed $data, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
 		Json::Output(data: $data, pretty: $pretty, etag: $etag, last_modified: $last_modified);
 	}
-	public static function Error(int $code = 500, ?string $message = null, ?int $message_id = null): never
+	public static function Success(mixed $data, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
-		http_response_code($code);
-		self::Output([
-			'success' => false,
-			'error' => $message ?? true,
-			'code' => $message_id ?? $code,
-		]);
+		Json::OutputSuccess(
+			data: $data,
+			pretty: $pretty,
+			etag: $etag,
+			last_modified: $last_modified,
+		);
+	}
+	public static function Error(?int $code = 500, null|string|array $message = null, ?int $message_id = null, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
+	{
+		Json::OutputError(
+			message: $message,
+			code: $code,
+			message_id: $message_id,
+			pretty: $pretty,
+			etag: $etag,
+			last_modified: $last_modified,
+		);
 	}
 	protected static bool $is_api = false;
 	public static function IsAPI(): bool
 	{
 		return self::$is_api;
 	}
-	public static function _ErrorHandler(): void
+	protected const ERROR_MESSAGE_500 = [
+		'en-US' => 'Server Error. Please try again later.',
+		'zh-Hant-TW' => '伺服器錯誤，請稍後再試。',
+	];
+	protected static function _ErrorHandler(): void
 	{
 		set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 			if (!(error_reporting() & $errno)) {
@@ -136,11 +151,17 @@ class API
 			if ($errtype === 'Notice') {
 				return true;
 			}
-			self::Error(500, "Server Error. Please try again later.\n$errtype $errstr ($errfile:$errline)");
+			self::Error(
+				code: 500,
+				message: array_map(fn($m) => $m . PHP_EOL . $errtype . ' ' . $errstr . ' (' . $errfile . ':' . $errline . ')', self::ERROR_MESSAGE_500),
+			);
 		}, E_ALL);
 		error_reporting(E_ALL);
 		set_exception_handler(function (Throwable $exception) {
-			self::Error(500, 'Server Error. Please try again later.' . PHP_EOL . $exception->getMessage() . ' (' . $exception->getFile() . ':' . $exception->getLine() . ')');
+			self::Error(
+				code: 500,
+				message: array_map(fn($m) => $m . PHP_EOL . $exception->getMessage() . ' (' . $exception->getFile() . ':' . $exception->getLine() . ')', self::ERROR_MESSAGE_500),
+			);
 		});
 	}
 }

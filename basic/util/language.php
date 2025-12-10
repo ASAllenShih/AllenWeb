@@ -118,6 +118,7 @@ class Language
 	 * 從可用語言中選擇最適合的語言
 	 * @param string[] $langs 可用語言
 	 * @param string|null $current 目前語言，預設為 self::Get() 的結果
+	 * @param bool $final 若找不到相似語言時是否回傳預設語言，預設為 true
 	 * @return string|null 選擇的語言，若語言清單為空則回傳 null
 	 */
 	public static function GetSelect(array $langs, ?string $current = null, bool $final = true): ?string
@@ -126,7 +127,7 @@ class Language
 		if (in_array($current, $langs)) {
 			return $current;
 		}
-		usort($langs, fn($a, $b) => (array_search($a, self::LANGS) ?: \PHP_INT_MAX) <=> (array_search($b, self::LANGS) ?: \PHP_INT_MAX));
+		self::Sort($langs);
 		$lang_split = explode('-', $current);
 		$lang1 = array_filter($langs, fn($v) => str_starts_with($v, $lang_split[0]));
 		if (count($lang1) > 0) {
@@ -169,5 +170,25 @@ class Language
 			'zh-Hant-TW' => -1911,
 			default => 0,
 		};
+	}
+	/**
+	 * 對語言清單進行排序
+	 * @param string[] $langs 語言代碼陣列
+	 */
+	public static function Sort(array &$langs): void
+	{
+		usort($langs, fn($a, $b) => self::Compare($a, $b));
+	}
+	/**
+	 * 對語言清單的鍵進行排序
+	 * @param array<string, mixed> $langs 語言代碼陣列
+	 */
+	public static function SortK(array &$langs): void
+	{
+		uksort($langs, fn($a, $b) => self::Compare($a, $b));
+	}
+	protected static function Compare(string $a, string $b): int
+	{
+		return (array_search($a, self::LANGS) ?: \PHP_INT_MAX) <=> (array_search($b, self::LANGS) ?: \PHP_INT_MAX);
 	}
 }

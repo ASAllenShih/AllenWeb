@@ -4,11 +4,11 @@ namespace Allen\Basic\Util;
 
 class Header
 {
-	public static function Json(?string $text, ?string $charset = 'utf-8', bool $etag = true, ?int $last_modified = null): void
+	public static function Json(?string $text, ?string $charset = 'utf-8', ?bool $etag = null, ?int $last_modified = null): void
 	{
 		self::SetContentType('application/json', charset: $charset);
 		self::SetLastModified($last_modified);
-		if ($etag) self::ETag($text);
+		if ($etag ?? true) self::ETag($text);
 		if (is_string($text)) self::ContentLength($text);
 	}
 	public static function ContentLength(string $text): void
