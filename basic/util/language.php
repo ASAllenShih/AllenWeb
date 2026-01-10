@@ -150,8 +150,11 @@ class Language
 	 * @param string|null $lang 語言代碼，預設為 self::Get() 的結果
 	 * @return mixed|null 指定語言的內容，若無此語言則回傳 null
 	 */
-	public static function Output(array $data, ?string $lang = null): mixed
+	public static function Output(?array $data, ?string $lang = null): mixed
 	{
+		if (empty($data)) {
+			return null;
+		}
 		$lang ??= self::Get();
 		$result_lang = self::GetSelect(array_keys($data), $lang);
 		if ($result_lang === null) {

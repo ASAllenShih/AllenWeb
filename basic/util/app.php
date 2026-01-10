@@ -20,9 +20,9 @@ class APP
 		self::$version ??= self::_GetUA() ?? self::_GetWeb() ?? false;
 		return self::$version;
 	}
-	public static function Is(): bool
+	public static function Is(bool $web = true, ?string $ver_from = null, ?string $ver_to = null): bool
 	{
-		return self::Get() !== false;
+		return self::Get() !== false && ($web ?: !self::IsWeb()) && self::InVersion(from: $ver_from, to: $ver_to);
 	}
 	public static function IsWeb(): bool
 	{
@@ -36,19 +36,16 @@ class APP
 		}
 		return $version;
 	}
-	public static function InVersion(string $start = '0.0.0', ?string $end = null): bool
+	public static function InVersion(?string $from = null, ?string $to = null): bool
 	{
+		if (is_null($from) && is_null($to)) {
+			return true;
+		}
 		$version = self::Version();
-		if ($version === null) {
-			if (self::IsWeb()) {
-				return true;
-			}
-			return false;
+		if (($version)) {
+			return self::IsWeb();
 		}
-		if ($end === null) {
-			return version_compare($version, $start, '>=');
-		}
-		return version_compare($version, $start, '>=') && version_compare($version, $end, '<=');
+		return (is_null($from) ?: version_compare($version, $from, '>=')) && (is_null($to) ?: version_compare($version, $to, '<='));
 	}
 	public static function Open(?string $url = null): never
 	{

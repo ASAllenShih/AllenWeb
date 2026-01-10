@@ -29,7 +29,7 @@ class API
 			self::Error(400, 'Invalid version number, please use a positive integer.');
 		}
 		$namespace = (is_string($namespace_prefix) ? $namespace_prefix . '\\' : '') . str_replace('/', '\\', $service) . '\\v' . $version;
-		$class = $namespace . '\\main';
+		$class = class_exists($namespace) ? $namespace : ($namespace . '\\main');
 		if (!class_exists($class)) {
 			self::Error(404, 'Service class does not exist, please check the service name and version number.');
 		}
@@ -105,21 +105,23 @@ class API
 	{
 		Json::Output(data: $data, pretty: $pretty, etag: $etag, last_modified: $last_modified);
 	}
-	public static function Success(mixed $data, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
+	public static function Success(mixed $data, array $more = [], ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
 		Json::OutputSuccess(
 			data: $data,
+			more: $more,
 			pretty: $pretty,
 			etag: $etag,
 			last_modified: $last_modified,
 		);
 	}
-	public static function Error(?int $code = 500, null|string|array $message = null, ?int $message_id = null, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
+	public static function Error(?int $code = 500, null|string|array $message = null, ?int $message_id = null, array $more = [], ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
 		Json::OutputError(
 			message: $message,
 			code: $code,
 			message_id: $message_id,
+			more: $more,
 			pretty: $pretty,
 			etag: $etag,
 			last_modified: $last_modified,

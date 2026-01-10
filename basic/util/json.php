@@ -28,33 +28,33 @@ class Json
 		echo $output;
 		exit;
 	}
-	public static function OutputSuccess(mixed $data, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
+	public static function OutputSuccess(mixed $data, array $more = [], ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
-		$data = [
-			'success' => true,
-			'data' => $data,
-		];
 		self::Output(
-			data: $data,
+			data: [
+				'success' => true,
+				'data' => $data,
+				...$more,
+			],
 			pretty: $pretty,
 			etag: $etag,
 			last_modified: $last_modified,
 		);
 	}
-	public static function OutputError(?int $code = 500, null|string|array $message = null, ?int $message_id = null, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
+	public static function OutputError(?int $code = 500, null|string|array $message = null, ?int $message_id = null, array $more = [], ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
 		if (!is_null($code)) {
 			http_response_code($code);
 		}
-		$data = [
-			'success' => false,
-			'error' => is_null($message)
-				? true
-				: $message,
-			'code' => $message_id ?? $code,
-		];
 		self::Output(
-			data: $data,
+			data: [
+				'success' => false,
+				'error' => is_null($message)
+					? true
+					: $message,
+				'code' => $message_id ?? $code,
+				...$more,
+			],
 			pretty: $pretty,
 			etag: $etag,
 			last_modified: $last_modified,
