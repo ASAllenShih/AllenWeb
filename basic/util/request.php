@@ -303,7 +303,6 @@ class Request
 				$response = json_decode($response, true);
 			}
 		}
-		curl_close($ch);
 		return [
 			'code' => $code,
 			'response' => $response,
