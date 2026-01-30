@@ -216,7 +216,7 @@ class Kb
 				'zh-Hant-TW' => '回知識庫首頁',
 				'zh-Hans-TW' => '回知识库首页',
 			]), href: Uri::Link('?', lang: true)) ?>
-			<?php if (count(explode('/', $kb)) > 1) { ?>
+			<?php if (count(explode('/', $this->id)) > 1) { ?>
 				<?= new ButtonLink(content: Language::Output([
 					'en-US' => 'Back to Parent',
 					'zh-Hant-TW' => '回上層',
