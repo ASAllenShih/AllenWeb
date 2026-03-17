@@ -35,7 +35,10 @@ class Web
 		?bool $cache_no_store = null,
 		?int $cache_max_age = null,
 		?bool $cache_must_revalidate = null,
+		string $id = '',
 	): void {
+		if (self::$id !== null) return;
+		self::$id = $id;
 		if ($etag === true) ob_start(function (string $content) {
 			Header::ContentLength($content);
 			Header::ETag($content);
@@ -59,11 +62,14 @@ class Web
 	public static function End(
 		?string $script = null,
 		bool $footer = true,
+		string $id = '',
 	): void {
+		if (self::$id === null || self::$id !== $id) return;
 		require_once __DIR__ . '/data/end.php';
 	}
 	public static function Config(): void
 	{
 		Config::Init();
 	}
+	protected static ?string $id = null;
 }
