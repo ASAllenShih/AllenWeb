@@ -48,12 +48,14 @@ class Language
 						foreach (array_keys($accept) as $al) {
 							$lang_find = self::GetSelect($lang_support, $al);
 							if (!is_null($lang_find) && self::Set($lang_find)) {
+								http_response_code(307);
 								header('Location: ' . ($lang_find === Config::Get('util.language.default', 'zh-Hant-TW') ? $uri->RemoveQuery('lang') : $uri->AddQuery('lang', $lang_find))->Get());
 								die();
 							}
 						}
 					}
 					if (!is_string($_REQUEST['lang']) || $_REQUEST['lang'] === Config::Get('util.language.default', 'zh-Hant-TW') || !self::Set($_REQUEST['lang'])) {
+						http_response_code(307);
 						header('Location: ' . $uri->RemoveQuery('lang')->Get());
 						die();
 					}
