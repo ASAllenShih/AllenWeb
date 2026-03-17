@@ -1,5 +1,7 @@
 <?php
 use Allen\Basic\Util\Config;
+use Allen\Basic\Util\Server;
+
 ?>
 <footer>
 	<?php
@@ -14,7 +16,7 @@ use Allen\Basic\Util\Config;
 		),
 	) ?>
 	<?php
-	if (Config::Get('web.end.language_choose', true)) {
+	if (Config::Get('web.end.language_choose', true) && Server::GetMethod() === 'GET') {
 		require_once __DIR__ . '/footer/language.php';
 	}
 	?>
