@@ -6,7 +6,6 @@ use CurlHandle;
 
 class Request
 {
-	protected string $url;
 	/**
 	 * 請求
 	 * @param string|null $url 請求的 URL
@@ -15,15 +14,11 @@ class Request
 	 * @param string|null $ua 使用的 User-Agent，預設為 Config::Get('util.request.ua') 或不設定
 	 */
 	public function __construct(
-		?string $url = null,
+		protected ?string $url = null,
 		protected ?string $data = null,
 		protected array $header = [],
 		protected ?string $ua = null,
-	) {
-		if ($url !== null) {
-			$this->url = $url;
-		}
-	}
+	) {}
 	/**
 	 * 取得請求 URL
 	 * @return string|null
