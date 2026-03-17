@@ -53,10 +53,13 @@ class Web
 	/**
 	 * 結束網頁
 	 * @param ?string $script 腳本HTML
+	 * @param bool $footer 是否啟用結尾HTML
 	 * @return void
 	 */
-	public static function End(?string $script = null): void
-	{
+	public static function End(
+		?string $script = null,
+		bool $footer = true,
+	): void {
 		require_once __DIR__ . '/data/end.php';
 	}
 	public static function Config(): void
