@@ -54,7 +54,7 @@ class Language
 							}
 						}
 					}
-					if (!is_string($_REQUEST['lang']) || $_REQUEST['lang'] === Config::Get('util.language.default', 'zh-Hant-TW') || !self::Set($_REQUEST['lang'])) {
+					if (!is_string($_REQUEST['lang']) || ($_REQUEST['lang'] === Config::Get('util.language.default', 'zh-Hant-TW') && Server::GetMethod() === 'GET') || !self::Set($_REQUEST['lang'])) {
 						http_response_code(307);
 						header('Location: ' . $uri->RemoveQuery('lang')->Get());
 						die();
