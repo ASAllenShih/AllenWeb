@@ -52,7 +52,7 @@ class Menu
 				$sitemaps = array_merge($sitemaps, self::Sitemap($value));
 			}
 		}
-		return $sitemaps;
+		return array_values(array_map(fn($item) => 'https://' . Server::GetDomain() . $item, array_filter(array_unique($sitemaps), fn($item) => str_starts_with($item, '/'))));
 	}
 	static protected function ListItem(string $name, ?string $url = null, ?array $children = null): string
 	{
