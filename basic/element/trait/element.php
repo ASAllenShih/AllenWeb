@@ -45,6 +45,14 @@ trait Element
 		$this->content = '';
 		return $this->ContentAdd(...$content);
 	}
+	public function TextContentAdd(string ...$content): self
+	{
+		return $this->ContentAdd(...array_map(fn($item) => htmlspecialchars($item), $content));
+	}
+	public function TextContentSet(string ...$content): self
+	{
+		return $this->ContentSet(...array_map(fn($item) => htmlspecialchars($item), $content));
+	}
 	/**
 	 * 取得所有屬性
 	 */
