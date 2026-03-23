@@ -39,7 +39,12 @@ class Menu
 		$output .= '</ul>';
 		return $output;
 	}
-	static public function Sitemap(array $menu): array
+	static public function Sitemap(): array
+	{
+		$sitemaps = self::ListSitemap(self::Get());
+		return array_values(array_map(fn($item) => 'https://' . Server::GetDomain() . $item, array_filter(array_unique($sitemaps), fn($item) => str_starts_with($item, '/'))));
+	}
+	static protected function ListSitemap(array $menu): array
 	{
 		$sitemaps = [];
 		foreach ($menu as $value) {
@@ -49,10 +54,10 @@ class Menu
 				if (isset($value[0])) {
 					$sitemaps[] = $value[0];
 				}
-				$sitemaps = array_merge($sitemaps, self::Sitemap($value));
+				$sitemaps = array_merge($sitemaps, self::ListSitemap($value));
 			}
 		}
-		return array_values(array_map(fn($item) => 'https://' . Server::GetDomain() . $item, array_filter(array_unique($sitemaps), fn($item) => str_starts_with($item, '/'))));
+		return $sitemaps;
 	}
 	static protected function ListItem(string $name, ?string $url = null, ?array $children = null): string
 	{
