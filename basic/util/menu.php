@@ -51,9 +51,6 @@ class Menu
 			if (is_string($value)) {
 				$sitemaps[] = $value;
 			} else if (is_array($value)) {
-				if (isset($value[0])) {
-					$sitemaps[] = $value[0];
-				}
 				$sitemaps = array_merge($sitemaps, self::ListSitemap($value));
 			}
 		}
