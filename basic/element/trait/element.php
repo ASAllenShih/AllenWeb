@@ -76,7 +76,7 @@ trait Element
 	 */
 	public function AttributeAdd(string $key, ?string $value = null): self
 	{
-		$this->attribute[$key] = is_string($value) ? htmlspecialchars($value) : $value;
+		$this->attribute[$key] = is_string($value) ? str_replace(['"'], ['\\"'], $value) : null;
 		return $this;
 	}
 	/**
