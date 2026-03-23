@@ -148,14 +148,16 @@ class Language
 	}
 	/**
 	 * 輸出指定語言的內容
-	 * @param array<string, mixed> $data 語言內容，鍵為語言代碼，值為內容
+	 * @param array<string, mixed>|string|null $data 語言內容，鍵為語言代碼，值為內容
 	 * @param string|null $lang 語言代碼，預設為 self::Get() 的結果
 	 * @return mixed|null 指定語言的內容，若無此語言則回傳 null
 	 */
-	public static function Output(?array $data, ?string $lang = null): mixed
+	public static function Output(array|string|null $data, ?string $lang = null): mixed
 	{
 		if (empty($data)) {
 			return null;
+		} else if (!is_array($data)) {
+			return $data;
 		}
 		$lang ??= self::Get();
 		$result_lang = self::GetSelect(array_keys($data), $lang);
