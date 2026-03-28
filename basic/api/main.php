@@ -44,11 +44,17 @@ class API
 	}
 	public static function _Run(
 		?string $namespace_prefix = 'Allen\\apis',
+		array $service_rewrite = [],
 	): void {
 		$service = self::InputQuery('service', required: true);
 		$version = self::InputQuery('version', required: true);
 		if (filter_var($version, FILTER_VALIDATE_INT) === false) {
 			self::Error(400, 'Invalid version number, please use a positive integer.');
+		}
+		$service_rewrite_list = array_filter($service_rewrite, fn($v, $k) => is_string($v) && ($k === $service || str_ends_with($service, $k . '/')), ARRAY_FILTER_USE_BOTH);
+		if (!empty($service_rewrite_list)) {
+			$service_rewrite_key = array_key_last($service_rewrite_list);
+			$service = substr_replace($service, $service_rewrite_list[$service_rewrite_key], strrpos($service, $service_rewrite_key), strlen($service_rewrite_key));
 		}
 		self::_Execute(
 			service: $service,
@@ -67,20 +73,39 @@ class API
 		}
 		$content = Server::GetHeader($header);
 		if (is_null($content) && $required) {
-			self::Error(400, "標頭 '$header' 是必需的。");
+			self::Error(
+				code: 400,
+				message: [
+					'en-US' => "Header '$header' is required.",
+					'zh-Hant-TW' => "標頭 '$header' 是必需的。",
+				],
+			);
 		}
 		return $content;
 	}
-	public static function InputQuery(?string $query = null, bool $required = true): array|string|null
+	public static function InputQuery(?string $query = null, bool $required = true, array|string|null $default = null, ?array $allow = null): array|string|null
 	{
 		if (is_null($query)) {
 			return $_REQUEST;
 		} else if (isset($_REQUEST[$query])) {
-			return $_REQUEST[$query];
+			$value = $_REQUEST[$query];
+			if (is_array($allow) && !in_array($value, $allow)) {
+				self::Error(400, [
+					'en-US' => "The value of parameter '$query' is not in the allowed range.",
+					'zh-Hant-TW' => "參數 '$query' 的值不在允許的範圍內。",
+				]);
+			}
+			return $value;
 		} else if ($required) {
-			self::Error(400, "參數 '$query' 是必需的。");
+			self::Error(
+				code: 400,
+				message: [
+					'en-US' => "Parameter '$query' is required.",
+					'zh-Hant-TW' => "參數 '$query' 是必需的。",
+				],
+			);
 		}
-		return null;
+		return $default;
 	}
 	public static function InputData(bool $required = true, bool $json = true): mixed
 	{
@@ -131,6 +156,15 @@ class API
 	public static function IsAPI(): bool
 	{
 		return self::$is_api;
+	}
+	public static function RunAPIs(): void
+	{
+		self::_Run(
+			namespace_prefix: 'Allen\\apis',
+			service_rewrite: [
+				'allen/news' => 'news',
+			],
+		);
 	}
 	protected const ERROR_MESSAGE_500 = [
 		'en-US' => 'Server Error. Please try again later.',
