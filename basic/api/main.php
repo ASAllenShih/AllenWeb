@@ -2,7 +2,7 @@
 
 namespace Allen\Basic;
 
-use Allen\Basic\Util\{Json, Server};
+use Allen\Basic\Util\{Json, Language, Server};
 use Throwable;
 
 class API
@@ -126,6 +126,34 @@ class API
 		}
 		return $data;
 	}
+	public static function InputQueryInt(string $query, bool $required = true, ?int $default = null, ?int $min = null, ?int $max = null): ?int
+	{
+		$value = self::InputQuery(
+			query: $query,
+			required: $required,
+		);
+		if (is_null($value)) {
+			return $default;
+		} else if (filter_var($value, FILTER_VALIDATE_INT) === false) {
+			self::Error(400, [
+				'en-US' => "Parameter '$query' must be an integer.",
+				'zh-Hant-TW' => "參數 '$query' 必須是一個整數。",
+			]);
+		}
+		$value = intval($value);
+		if (!is_null($min) && $value < $min) {
+			self::Error(400, [
+				'en-US' => "Parameter '$query' must be greater than or equal to '$min'.",
+				'zh-Hant-TW' => "參數 '$query' 必須大於或等於 '$min'。",
+			]);
+		} else if (!is_null($max) && $value > $max) {
+			self::Error(400, [
+				'en-US' => "Parameter '$query' must be less than or equal to '$max'.",
+				'zh-Hant-TW' => "參數 '$query' 必須小於或等於 '$max'。",
+			]);
+		}
+		return $value;
+	}
 	public static function Output(mixed $data, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
 		Json::Output(data: $data, pretty: $pretty, etag: $etag, last_modified: $last_modified);
@@ -156,6 +184,25 @@ class API
 	public static function IsAPI(): bool
 	{
 		return self::$is_api;
+	}
+	public static function Lang(array|string|null $data): array|string|null
+	{
+		if (is_null($data) || is_string($data)) {
+			return $data;
+		}
+		$lang = self::InputQuery('lang', required: false, allow: array_keys(Language::LANGS));
+		if (empty($lang)) {
+			return $data;
+		} else if (is_string($lang)) {
+			return Language::Output($data, lang: $lang);
+		} else if (is_array($lang)) {
+			return array_filter(
+				$data,
+				fn($k) => in_array($k, $lang),
+				ARRAY_FILTER_USE_KEY,
+			);
+		}
+		return $data;
 	}
 	public static function RunAPIs(): void
 	{

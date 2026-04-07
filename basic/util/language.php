@@ -2,6 +2,8 @@
 
 namespace Allen\Basic\Util;
 
+use Allen\Basic\API;
+
 class Language
 {
 	/**
@@ -54,7 +56,7 @@ class Language
 							}
 						}
 					}
-					if (!is_string($_REQUEST['lang']) || ($_REQUEST['lang'] === Config::Get('util.language.default', 'zh-Hant-TW') && Server::GetMethod() === 'GET') || !self::Set($_REQUEST['lang'])) {
+					if (!is_string($_REQUEST['lang']) || ($_REQUEST['lang'] === Config::Get('util.language.default', 'zh-Hant-TW') && Server::GetMethod() === 'GET' && !API::IsAPI()) || !self::Set($_REQUEST['lang'])) {
 						http_response_code(307);
 						header('Location: ' . $uri->RemoveQuery('lang')->Get());
 						die();
@@ -177,6 +179,15 @@ class Language
 			'zh-Hant-TW' => -1911,
 			default => 0,
 		};
+	}
+	/**
+	 * 檢查語言代碼是否有效
+	 * @param string $lang 語言代碼
+	 * @return bool 是否有效
+	 */
+	public static function IsValid(string $lang): bool
+	{
+		return in_array($lang, array_keys(self::LANGS));
 	}
 	/**
 	 * 對語言清單進行排序

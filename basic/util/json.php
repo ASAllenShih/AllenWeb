@@ -21,6 +21,11 @@ class Json
 	{
 		return json_decode($json, true);
 	}
+	public static function DecodeArray(string $json, bool $stringToArray = false): array
+	{
+		$data = self::Decode($json);
+		return is_array($data) ? $data : ($stringToArray && is_string($data) ? [$data] : []);
+	}
 	public static function Output(mixed $data, ?bool $pretty = null, ?bool $etag = null, ?int $last_modified = null): never
 	{
 		$output = self::Encode($data, $pretty);
