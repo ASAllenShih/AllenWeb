@@ -1,6 +1,6 @@
 /apis
 /id
-/xhost/dash
+/xhost
 /cache
 /setting/**/*.php
 /setting/**/*.json
