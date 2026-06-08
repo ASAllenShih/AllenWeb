@@ -252,6 +252,7 @@ class Request
 		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 		if (!is_null($method)) curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 		if (!is_null($ua)) curl_setopt($ch, CURLOPT_USERAGENT, $ua);
 		return $ch;
