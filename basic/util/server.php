@@ -39,4 +39,27 @@ class Server
 		}
 		return trim($ip);
 	}
+	public static function GetRequestTime(bool $float = true): float|int
+	{
+		return $float ? ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true)) : ($_SERVER['REQUEST_TIME'] ?? time());
+	}
+	public static function Sleep(int|float $seconds, bool $float = true): void
+	{
+		$int_seconds = intval($seconds);
+		if ($int_seconds > 0) {
+			sleep($int_seconds);
+		}
+		if ($float) {
+			$micro_seconds = intval(($seconds - $int_seconds) * 1000000);
+			if ($micro_seconds > 0) {
+				usleep($micro_seconds);
+			}
+		}
+	}
+	public static function SleepRequest(int|float $seconds, bool $float = true): void
+	{
+		$time = self::GetRequestTime(float: $float) + ($float ? $seconds : intval($seconds));
+		$time -= ($float ? microtime(true) : time());
+		self::Sleep($time, float: $float);
+	}
 }
