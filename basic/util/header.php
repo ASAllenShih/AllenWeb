@@ -90,4 +90,8 @@ class Header
 	{
 		self::Set('Vary', implode(', ', $value));
 	}
+	public static function SetRetryAfter(int $seconds): void
+	{
+		self::Set('Retry-After', strval($seconds));
+	}
 }

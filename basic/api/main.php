@@ -2,7 +2,7 @@
 
 namespace Allen\Basic;
 
-use Allen\Basic\Util\{Json, Language, Server};
+use Allen\Basic\Util\{Json, Language, Server, Header, RateLimit};
 use Throwable;
 
 class API
@@ -179,6 +179,33 @@ class API
 			etag: $etag,
 			last_modified: $last_modified,
 		);
+	}
+	protected static function _RateLimit(?int $remaining = null): never
+	{
+		if (!is_null($remaining)) {
+			Header::SetRetryAfter($remaining);
+		}
+		self::Error(
+			code: 429,
+			message: [
+				'en-US' => 'Rate limit exceeded. Please try again ' . (!is_null($remaining) ? "after $remaining seconds." : 'later.'),
+				'zh-Hant-TW' => '超過速率限制，請稍後再試' . (!is_null($remaining) ? "，請在 $remaining 秒後再試。" : '。')
+			],
+		);
+	}
+	public static function RateLimit(int $limit, int $seconds, string $id): void
+	{
+		$remaining = RateLimit::Check($limit, $seconds, $id);
+		if (!is_null($remaining)) {
+			self::_RateLimit($remaining);
+		}
+	}
+	public static function RateLimitIP(int $limit, int $seconds, string $prefix = ''): void
+	{
+		$remaining = RateLimit::CheckIP($limit, $seconds, $prefix);
+		if (!is_null($remaining)) {
+			self::_RateLimit($remaining);
+		}
 	}
 	protected static bool $is_api = false;
 	public static function IsAPI(): bool

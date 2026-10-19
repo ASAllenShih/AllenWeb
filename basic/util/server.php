@@ -30,4 +30,13 @@ class Server
 		if (is_null($domain)) return null;
 		return array_reverse(explode('.', $domain));
 	}
+	public static function GetIP(): ?string
+	{
+		$ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? null;
+		if (is_null($ip)) return null;
+		if (str_contains($ip, ',')) {
+			$ip = explode(',', $ip)[0];
+		}
+		return trim($ip);
+	}
 }
