@@ -4,11 +4,29 @@ namespace Allen\Basic\Util;
 
 class RateLimit
 {
-	public static function Check(int $limit, int $seconds, string $id): ?int
+	protected static bool $hasClean = false;
+	public static function Clean(): void
 	{
+		if (self::$hasClean) return;
+		self::$hasClean = true;
 		$db = Db::Get();
 		// 先清除資料庫內已過期的時間
 		$db->query('DELETE FROM `rate_limit` WHERE `release` < NOW()');
+	}
+	public static function Clear(?string $id, bool $like = false): void
+	{
+		$db = Db::Get();
+		if (is_null($id)) {
+			$db->query('DELETE FROM `rate_limit`');
+		} else {
+			$stmt = $db->prepare('DELETE FROM `rate_limit` WHERE `id` ' . ($like ? 'LIKE' : '=') . ' ?');
+			$stmt->execute([$id]);
+		}
+	}
+	public static function Check(int $limit, int $seconds, string $id): ?int
+	{
+		self::Clean();
+		$db = Db::Get();
 		// 取得目前的請求數量
 		$stmt = $db->prepare('SELECT COUNT(*) AS `count` FROM `rate_limit` WHERE `id` = ?');
 		$stmt->execute([$id]);
